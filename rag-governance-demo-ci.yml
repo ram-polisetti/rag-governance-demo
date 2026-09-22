@@ -1,0 +1,30 @@
+name: CI
+
+# The governance gate, enforced on the pipeline itself: no merge to main
+# unless the unit tests AND the full eval harness (groundedness + red-team)
+# pass on both retrievers.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests -v
+
+      - name: Eval harness (TF-IDF + gate + red-team attack cases)
+        run: python3 -m src.eval
+
+      - name: Eval A/B (TF-IDF vs dense embeddings, both must pass)
+        run: python3 -m src.eval --ab
