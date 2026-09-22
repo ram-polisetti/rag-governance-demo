@@ -28,6 +28,11 @@ system as built: TF-IDF retrieval + extractive stub backend + governance gate.*
   refusal on out-of-corpus queries, escalation on ambiguous queries.
 - **Thresholds:** refuse below 0.10, escalate below 0.25 top retrieval score.
   Chosen conservatively; re-tune if the corpus or retriever changes.
+- **Measured 2026-09-22 (A/B):** swapping TF-IDF for dense retrieval flipped
+  two edge cases between `answer` and `escalate` (scores moved 0.212->0.257
+  and 0.279->0.244) with no change in pass rate. Thresholds are therefore
+  retriever-specific: any retriever swap requires recalibration on the eval
+  set before deployment.
 - **What is NOT yet measured:** paraphrase robustness, adversarial prompt
   injection, latency, multi-doc synthesis quality. (Roadmap: P4/P5.)
 

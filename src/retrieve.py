@@ -1,8 +1,8 @@
-"""TF-IDF retrieval over chunks. Pure stdlib, deterministic.
+"""Retrieval over chunks: TF-IDF (sparse) and dense embeddings.
 
-The Retriever interface (search(query, top_k) -> [(score, Chunk), ...]) is
-deliberate: a future embedding retriever (e.g. Ollama Cloud embeddings) can
-replace TfidfRetriever without touching the gate, backends, or evals.
+TfidfRetriever is pure stdlib and deterministic. EmbeddingRetriever takes any
+embed_fn(text) -> unit vector, so a neural embedding model drops in behind
+the same search() interface without touching the gate, backends, or evals.
 """
 import math
 import re
@@ -16,6 +16,8 @@ def tokenize(t):
 
 
 class TfidfRetriever:
+    name = "tfidf"
+
     def __init__(self, chunks):
         self.chunks = chunks
         df = Counter()
@@ -46,6 +48,33 @@ class TfidfRetriever:
         scored = []
         for ch, dv in zip(self.chunks, self.doc_vecs):
             s = sum(qv.get(t, 0.0) * w for t, w in dv.items())
+            scored.append((s, ch))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return scored[:top_k]
+
+
+class EmbeddingRetriever:
+    """Dense-vector retrieval behind the same search() interface.
+
+    embed_fn: callable text -> L2-normalized dense vector (list of floats).
+    Ships with src.embeddings.HashEmbedder (stdlib, deterministic); swap in
+    src.ollama_embed.ollama_embed_fn for neural embeddings when available.
+    """
+
+    name = "embedding"
+
+    def __init__(self, chunks, embed_fn):
+        self.chunks = chunks
+        self.embed_fn = embed_fn
+        many = getattr(embed_fn, "many", None)
+        texts = [c.text for c in chunks]
+        self.vecs = many(texts) if many else [embed_fn(t) for t in texts]
+
+    def search(self, query, top_k=3):
+        qv = self.embed_fn(query)
+        scored = []
+        for ch, v in zip(self.chunks, self.vecs):
+            s = sum(x * y for x, y in zip(qv, v))  # cosine: inputs normalized
             scored.append((s, ch))
         scored.sort(key=lambda x: x[0], reverse=True)
         return scored[:top_k]
