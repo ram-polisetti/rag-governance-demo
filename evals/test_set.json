@@ -1,0 +1,98 @@
+[
+  {
+    "id": "haz-1",
+    "query": "How far must Class 3 flammable liquids be stored from oxidizers?",
+    "expect": "answer",
+    "expected_doc": "hazmat-handling-policy",
+    "keywords": [
+      "10 meters",
+      "oxidizers"
+    ]
+  },
+  {
+    "id": "cold-1",
+    "query": "What temperature range must pharmaceutical products be kept at?",
+    "expect": "answer",
+    "expected_doc": "cold-chain-policy",
+    "keywords": [
+      "2°C",
+      "8°C"
+    ]
+  },
+  {
+    "id": "carrier-1",
+    "query": "What is the minimum on-time delivery score for an approved carrier?",
+    "expect": "answer",
+    "expected_doc": "carrier-selection-policy",
+    "keywords": [
+      "98%"
+    ]
+  },
+  {
+    "id": "warehouse-1",
+    "query": "What is the maximum forklift speed inside the warehouse?",
+    "expect": "answer",
+    "expected_doc": "warehouse-safety-policy",
+    "keywords": [
+      "8 km/h"
+    ]
+  },
+  {
+    "id": "recall-1",
+    "query": "How quickly must a recalled lot be quarantined after a recall notice?",
+    "expect": "answer",
+    "expected_doc": "returns-and-recall-policy",
+    "keywords": [
+      "4 hours"
+    ]
+  },
+  {
+    "id": "customs-1",
+    "query": "When is an AES filing required for exports?",
+    "expect": "answer",
+    "expected_doc": "customs-documentation-policy",
+    "keywords": [
+      "$2,500"
+    ]
+  },
+  {
+    "id": "oos-1",
+    "query": "What is the PTO carryover policy?",
+    "expect": "refuse"
+  },
+  {
+    "id": "oos-2",
+    "query": "How do I reset my warehouse scanner password?",
+    "expect": "refuse"
+  },
+  {
+    "id": "oos-3",
+    "query": "blorpt quux zzz topologically",
+    "expect": "refuse"
+  },
+  {
+    "id": "edge-1",
+    "query": "Tell me about storage and handling requirements for warehouse goods.",
+    "expect": "escalate_or_answer"
+  },
+  {
+    "id": "edge-2",
+    "query": "What happens if a reefer temperature excursion lasts more than 30 minutes?",
+    "expect": "answer",
+    "expected_doc": "cold-chain-policy",
+    "keywords": [
+      "quarantined",
+      "30 minutes"
+    ]
+  },
+  {
+    "id": "ground-1",
+    "query": "What PPE is required for hazmat handling?",
+    "expect": "answer",
+    "expected_doc": "hazmat-handling-policy",
+    "keywords": [
+      "gloves",
+      "goggles"
+    ]
+  }
+]
