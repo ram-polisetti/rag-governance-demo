@@ -22,9 +22,30 @@ class SmokeTest(unittest.TestCase):
         cls.backend = StubBackend()
 
     def test_ingest_produces_chunks(self):
-        self.assertGreaterEqual(len(self.chunks), 12)
+        self.assertGreaterEqual(len(self.chunks), 29)
         doc_ids = {c.doc_id for c in self.chunks}
-        self.assertEqual(len(doc_ids), 6)
+        self.assertEqual(len(doc_ids), 21)
+        domains = {c.domain for c in self.chunks}
+        self.assertEqual(domains,
+                         {"supply-chain", "hr-hiring", "data-privacy",
+                          "lending"})
+        # citations always name the domain
+        for c in self.chunks:
+            self.assertTrue(c.chunk_id.startswith(c.domain + "/"))
+
+    def test_ingest_domain_filter(self):
+        hr = ingest(ROOT / "corpus", domain="hr-hiring")
+        self.assertTrue(hr)
+        self.assertTrue(all(c.domain == "hr-hiring" for c in hr))
+        self.assertEqual({c.doc_id for c in hr},
+                         {c.doc_id for c in self.chunks
+                          if c.domain == "hr-hiring"})
+
+    def test_list_domains(self):
+        from ingest import list_domains
+        self.assertEqual(list_domains(ROOT / "corpus"),
+                         ["data-privacy", "hr-hiring", "lending",
+                          "supply-chain"])
 
     def test_retrieval_finds_hazmat(self):
         scored = self.retr.search(

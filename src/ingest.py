@@ -1,4 +1,10 @@
-"""Document ingestion: load markdown corpus, chunk deterministically."""
+"""Document ingestion: load a multi-domain markdown corpus, chunk deterministically.
+
+Corpus layout: corpus/<domain>/<doc>.md. doc_id is "<domain>/<doc>" so
+citations always name the domain; every Chunk carries its domain for
+per-domain retrieval and evaluation.
+"""
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -10,13 +16,23 @@ class Chunk:
     chunk_id: str
     text: str
     section: str
+    domain: str
 
 
 def load_corpus(corpus_dir):
+    """Return {doc_id: (domain, text)} for every *.md under corpus_dir."""
     docs = {}
-    for p in sorted(Path(corpus_dir).glob("*.md")):
-        docs[p.stem] = p.read_text(encoding="utf-8")
+    for p in sorted(Path(corpus_dir).rglob("*.md")):
+        rel = p.relative_to(corpus_dir)
+        domain = rel.parent.name if len(rel.parts) > 1 else "general"
+        doc_id = str(rel.with_suffix("")).replace(os.sep, "/")
+        docs[doc_id] = (domain, p.read_text(encoding="utf-8"))
     return docs
+
+
+def list_domains(corpus_dir):
+    """Sorted list of policy domains present in the corpus."""
+    return sorted({domain for domain, _ in load_corpus(corpus_dir).values()})
 
 
 def chunk_text(text, max_chars=800):
@@ -35,10 +51,14 @@ def chunk_text(text, max_chars=800):
     return chunks
 
 
-def ingest(corpus_dir):
+def ingest(corpus_dir, domain=None):
+    """Ingest the corpus; if domain is given, only that domain's documents."""
     docs = load_corpus(corpus_dir)
     chunks = []
-    for doc_id, text in docs.items():
+    for doc_id, (ddomain, text) in docs.items():
+        if domain is not None and ddomain != domain:
+            continue
         for i, (ctext, section) in enumerate(chunk_text(text)):
-            chunks.append(Chunk(doc_id, f"{doc_id}#c{i}", ctext, section))
+            chunks.append(Chunk(doc_id, f"{doc_id}#c{i}", ctext, section,
+                               ddomain))
     return chunks

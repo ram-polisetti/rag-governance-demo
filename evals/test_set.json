@@ -1,98 +1,197 @@
 [
   {
-    "id": "haz-1",
-    "query": "How far must Class 3 flammable liquids be stored from oxidizers?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "hazmat-handling-policy",
+    "id": "haz-1",
     "keywords": [
       "10 meters",
       "oxidizers"
-    ]
+    ],
+    "query": "How far must Class 3 flammable liquids be stored from oxidizers?"
   },
   {
-    "id": "cold-1",
-    "query": "What temperature range must pharmaceutical products be kept at?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "cold-chain-policy",
+    "id": "cold-1",
     "keywords": [
-      "2°C",
-      "8°C"
-    ]
+      "2\u00b0C",
+      "8\u00b0C"
+    ],
+    "query": "What temperature range must pharmaceutical products be kept at?"
   },
   {
-    "id": "carrier-1",
-    "query": "What is the minimum on-time delivery score for an approved carrier?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "carrier-selection-policy",
+    "id": "carrier-1",
     "keywords": [
       "98%"
-    ]
+    ],
+    "query": "What is the minimum on-time delivery score for an approved carrier?"
   },
   {
-    "id": "warehouse-1",
-    "query": "What is the maximum forklift speed inside the warehouse?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "warehouse-safety-policy",
+    "id": "warehouse-1",
     "keywords": [
       "8 km/h"
-    ]
+    ],
+    "query": "What is the maximum forklift speed inside the warehouse?"
   },
   {
-    "id": "recall-1",
-    "query": "How quickly must a recalled lot be quarantined after a recall notice?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "returns-and-recall-policy",
+    "id": "recall-1",
     "keywords": [
       "4 hours"
-    ]
+    ],
+    "query": "How quickly must a recalled lot be quarantined after a recall notice?"
   },
   {
-    "id": "customs-1",
-    "query": "When is an AES filing required for exports?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "customs-documentation-policy",
+    "id": "customs-1",
     "keywords": [
       "$2,500"
-    ]
+    ],
+    "query": "When is an AES filing required for exports?"
   },
   {
+    "domain": "supply-chain",
+    "expect": "refuse",
     "id": "oos-1",
-    "query": "What is the PTO carryover policy?",
-    "expect": "refuse"
+    "query": "What is the PTO carryover policy?"
   },
   {
+    "domain": "supply-chain",
+    "expect": "refuse",
     "id": "oos-2",
-    "query": "How do I reset my warehouse scanner password?",
-    "expect": "refuse"
+    "query": "How do I reset my warehouse scanner password?"
   },
   {
+    "domain": "supply-chain",
+    "expect": "refuse",
     "id": "oos-3",
-    "query": "blorpt quux zzz topologically",
-    "expect": "refuse"
+    "query": "blorpt quux zzz topologically"
   },
   {
+    "domain": "supply-chain",
+    "expect": "escalate_or_answer",
     "id": "edge-1",
-    "query": "Tell me about storage and handling requirements for warehouse goods.",
-    "expect": "escalate_or_answer"
+    "query": "Tell me about storage and handling requirements for warehouse goods."
   },
   {
-    "id": "edge-2",
-    "query": "What happens if a reefer temperature excursion lasts more than 30 minutes?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "cold-chain-policy",
+    "id": "edge-2",
     "keywords": [
       "quarantined",
       "30 minutes"
-    ]
+    ],
+    "query": "What happens if a reefer temperature excursion lasts more than 30 minutes?"
   },
   {
-    "id": "ground-1",
-    "query": "What PPE is required for hazmat handling?",
+    "domain": "supply-chain",
     "expect": "answer",
     "expected_doc": "hazmat-handling-policy",
+    "id": "ground-1",
     "keywords": [
       "gloves",
       "goggles"
-    ]
+    ],
+    "query": "What PPE is required for hazmat handling?"
+  },
+  {
+    "domain": "hr-hiring",
+    "expect": "answer",
+    "expected_doc": "hiring-policy",
+    "id": "hr-1",
+    "keywords": [
+      "3 interviewers",
+      "24 hours"
+    ],
+    "query": "How many interviewers must sit on a hiring panel?"
+  },
+  {
+    "domain": "hr-hiring",
+    "expect": "answer",
+    "expected_doc": "referral-policy",
+    "id": "hr-2",
+    "keywords": [
+      "$2,000",
+      "90 days"
+    ],
+    "query": "When is the employee referral bonus paid out?"
+  },
+  {
+    "domain": "hr-hiring",
+    "expect": "escalate_or_answer",
+    "id": "hr-edge-1",
+    "query": "What are the hiring steps for a contractor role?"
+  },
+  {
+    "domain": "data-privacy",
+    "expect": "answer",
+    "expected_doc": "breach-notification-policy",
+    "id": "priv-1",
+    "keywords": [
+      "24 hours"
+    ],
+    "query": "How quickly must a suspected breach be reported to the DPO?"
+  },
+  {
+    "domain": "data-privacy",
+    "expect": "answer",
+    "expected_doc": "data-retention-policy",
+    "id": "priv-2",
+    "keywords": [
+      "7 years"
+    ],
+    "query": "How long are customer records retained after the last account activity?"
+  },
+  {
+    "domain": "data-privacy",
+    "expect": "escalate_or_answer",
+    "id": "priv-edge-1",
+    "query": "What are the rules for monitoring employee emails?"
+  },
+  {
+    "domain": "lending",
+    "expect": "answer",
+    "expected_doc": "adverse-action-notice-policy",
+    "id": "lend-1",
+    "keywords": [
+      "30 days"
+    ],
+    "query": "How quickly must an adverse action notice be sent after a completed application?"
+  },
+  {
+    "domain": "lending",
+    "expect": "answer",
+    "expected_doc": "collections-policy",
+    "id": "lend-2",
+    "keywords": [
+      "8am",
+      "9pm"
+    ],
+    "query": "What hours can collections calls be made?"
+  },
+  {
+    "domain": "lending",
+    "expect": "escalate_or_answer",
+    "id": "lend-edge-1",
+    "query": "What happens if my credit application is denied?"
+  },
+  {
+    "domain": "lending",
+    "expect": "refuse",
+    "id": "xdomain-1",
+    "query": "What is the cold-chain temperature range for pharmaceuticals?"
   }
 ]

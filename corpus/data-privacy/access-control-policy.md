@@ -12,6 +12,10 @@ prohibited; elevated access is time-bound and ticketed.
 Managers must review their teams' access every quarter and revoke anything
 no longer needed. Unused credentials are disabled after 45 days of
 inactivity.
+## Monitoring
+Employee activity on company systems and networks may be monitored for
+security and compliance purposes. Monitoring is limited to company systems;
+personal devices and accounts are never monitored.
 ## Devices
 Production customer data must never be stored on personal devices. Lost or
 stolen company devices must be reported to IT within 24 hours.

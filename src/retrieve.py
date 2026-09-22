@@ -10,9 +10,21 @@ from collections import Counter
 
 TOKEN = re.compile(r"[a-z0-9]+")
 
+# Common English function words carry no topical signal. In a small corpus
+# they dominate cosine scores and let unrelated queries match (e.g. "what is
+# the ..." matching any chunk). Filtering them is standard IR practice.
+STOPWORDS = frozenset("""
+a an the and or but if then else when at by for with about into through
+during before after above below to from up down in out on off over under
+of is are was were be been being have has had do does did will would shall
+should can could may might must what which who whom whose how why where
+that this these those it its as not no so than too very just any all each
+both few more most other some such only own same s t d ll re ve m
+""".split())
+
 
 def tokenize(t):
-    return TOKEN.findall(t.lower())
+    return [tok for tok in TOKEN.findall(t.lower()) if tok not in STOPWORDS]
 
 
 class TfidfRetriever:
