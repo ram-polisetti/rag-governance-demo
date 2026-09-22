@@ -20,6 +20,12 @@ python3 -m src.cli "How far must Class 3 flammables be stored from oxidizers?"
 # Run the eval harness (12 cases: groundedness, citations, refusals)
 python3 -m src.eval
 
+# A/B: TF-IDF vs dense-embedding retrieval on the same test set
+python3 -m src.eval --ab
+
+# Use the dense retriever in the CLI
+python3 -m src.cli --retriever embed "What is the cold-chain temperature range?"
+
 # Run the smoke tests
 python3 -m unittest discover tests
 ```
@@ -30,6 +36,19 @@ python3 -m unittest discover tests
 export OLLAMA_API_KEY="..."            # your Ollama Cloud API key
 export OLLAMA_CLOUD_MODEL="gpt-oss:20b"  # optional
 python3 -m src.cli --backend ollama "What is the cold-chain temperature range?"
+```
+
+## Human review queue
+
+Escalated queries wait for a human verdict — collected from the audit log,
+decided on the CLI, and every verdict is appended back to the audit trail
+(append-only; history is never rewritten):
+
+```bash
+python3 -m src.review collect   # pull escalations from audit_log.jsonl
+python3 -m src.review list      # show pending items
+python3 -m src.review decide <id> approved --note "citation verified"
+# verdicts: approved | corrected | rejected
 ```
 
 ## How it works

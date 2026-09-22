@@ -5,3 +5,8 @@ audit_log.jsonl
 eval_audit.jsonl
 test_audit.jsonl
 .env
+eval_audit_tfidf.jsonl
+eval_audit_embed.jsonl
+review_queue.json
+review_queue.md
+review_decisions.jsonl
