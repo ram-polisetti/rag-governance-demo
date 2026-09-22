@@ -1,0 +1,2 @@
+# No dependencies. The demo is pure Python stdlib by design.
+# Optional (only for the Ollama Cloud backend): none -- uses urllib.
