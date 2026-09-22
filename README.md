@@ -11,17 +11,22 @@ Built by an operator, for operators. Through-line: **governance of AI in
 operational decision systems** — supply chain is where the builder comes
 from, not the boundary of what this governs.
 
-> **Synthetic data.** The `corpus/` policies are realistic but fictional,
-> written for this demo. Not real company policies.
+> **Synthetic vs real data.** Four domains are synthetic — realistic but
+> fictional policies written for this demo. Two domains are **real public
+> data**: `eu-ai-act` (Regulation (EU) 2024/1689, via EUR-Lex) and
+> `nist-ai-rmf` (NIST AI RMF 1.0). Real-data files are labeled as such in
+> their headers, with source URLs and retrieval dates.
 
 ## Policy domains (pluggable)
 
 ```
 corpus/
-├── supply-chain/   # hazmat, cold chain, carrier selection, warehouse safety, ...
-├── hr-hiring/      # hiring panels, equal opportunity, background checks, ...
-├── data-privacy/   # retention, access control, breach notification, ...
-└── lending/        # credit decisions, fair lending, adverse action, ...
+├── supply-chain/   # hazmat, cold chain, carrier selection, warehouse safety, ... (synthetic)
+├── hr-hiring/      # hiring panels, equal opportunity, background checks, ... (synthetic)
+├── data-privacy/   # retention, access control, breach notification, ... (synthetic)
+├── lending/        # credit decisions, fair lending, adverse action, ... (synthetic)
+├── eu-ai-act/      # Regulation (EU) 2024/1689, full text — REAL public data
+└── nist-ai-rmf/    # NIST AI Risk Management Framework 1.0 — REAL public data
 ```
 
 Adding a domain is adding a folder of markdown: `corpus/<domain>/*.md`.
@@ -42,8 +47,8 @@ python3 -m src.cli --domain hr-hiring "When is the referral bonus paid?"
 # ...or search all domains at once
 python3 -m src.cli "How quickly must a suspected breach be reported to the DPO?"
 
-# Run the eval harness (22 cases across 4 domains: groundedness, citations,
-# refusals, cross-domain isolation)
+# Run the eval harness (37 cases across 6 domains: groundedness,
+# citations, refusals, cross-domain isolation, red-team attack cases)
 python3 -m src.eval
 
 # A/B: TF-IDF vs dense-embedding retrieval on the same test set
@@ -92,11 +97,17 @@ corpus/<domain>/*.md --ingest--> chunks --TF-IDF--> top-k --GATE--> answer | ref
    interface, per-domain indexes.
 3. **Generate** (`src/backends.py`): `StubBackend` (extractive, cites chunk ids)
    or `OllamaCloudBackend` (Ollama Cloud chat, constrained to the excerpts).
-4. **Gate** (`src/gate.py`): the gate that says no. Refuses when the top
-   retrieval score is below threshold or the query is out of scope;
-   escalates to a human reviewer on low confidence. Thresholds and
-   out-of-scope patterns are configurable per domain. Every decision is
-   audit-logged with its domain.
+4. **Gate** (`src/gate.py`): the gate that says no. Refuses on
+   prompt-injection / jailbreak / exfiltration attempts (before the
+   backend is ever invoked), on quarantined evidence sources, when the
+   top retrieval score is below threshold, or when the query is out of
+   scope; escalates to a human reviewer on low confidence or when
+   quarantined chunks had to be excluded from the evidence. Ingest-time
+   scanning (`src/ingest.py` + `src/redteam.py`) excises embedded
+   instructions from corpus chunks and marks them quarantined. An output
+   check converts answers containing injected instructions into
+   refusals. Thresholds and out-of-scope patterns are configurable per
+   domain. Every decision is audit-logged with its domain.
 
 ## Governance packaging
 

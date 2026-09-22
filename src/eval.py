@@ -47,10 +47,22 @@ def load_cases(repo_root):
 
 
 def domain_chunks(repo_root):
-    """{domain: [Chunk]} for every domain in the corpus."""
+    """{domain: [Chunk]} for every domain in the corpus.
+
+    The red-team corpus (evals/redteam_corpus/<domain>/*.md -- documents
+    carrying embedded prompt-injection payloads) is folded into each
+    domain's index so poisoned-chunk attack cases execute against the same
+    pipeline as normal cases. Malicious chunks are sanitized and marked
+    trust="quarantined" at ingest (src/ingest.py); the gate must refuse
+    any query whose top-k evidence includes one.
+    """
     by_domain = {}
     for ch in ingest(Path(repo_root) / "corpus"):
         by_domain.setdefault(ch.domain, []).append(ch)
+    rt_dir = Path(repo_root) / "evals" / "redteam_corpus"
+    if rt_dir.exists():
+        for ch in ingest(rt_dir):
+            by_domain.setdefault(ch.domain, []).append(ch)
     return by_domain
 
 
@@ -80,6 +92,18 @@ def run_eval(repo_root, verbose=True):
     passed = sum(r["pass"] for r in results)
     if verbose:
         print(f"\n{passed}/{len(results)} eval cases passed")
+        id2case = {c["id"]: c for c in cases}
+        rt = [r for r in results if "attack" in id2case[r["id"]]]
+        if rt:
+            rt_pass = sum(r["pass"] for r in rt)
+            print(f"red-team attack cases: {rt_pass}/{len(rt)} passed")
+            by_attack = {}
+            for r in rt:
+                atk = id2case[r["id"]]["attack"]
+                p, n = by_attack.get(atk, (0, 0))
+                by_attack[atk] = (p + r["pass"], n + 1)
+            for atk, (p, n) in sorted(by_attack.items()):
+                print(f"  {atk}: {p}/{n}")
     return results
 
 

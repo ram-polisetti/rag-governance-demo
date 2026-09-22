@@ -73,8 +73,10 @@ Generation backends (src/backends.py):
 - P3: human review queue (escalated queries -> review UI / markdown inbox).
   — DONE (session 2; CLI collect/list/decide, append-only audit linkage)
 - P4: prompt-injection tests (malicious corpus chunk trying to override
-  instructions) + mitigation.
+  instructions) + mitigation. — DONE (session 4; see amendment below)
 - P5: larger corpus, multi-doc synthesis answers, GitHub Actions CI.
+  — DONE in part (session 4: real-data domains — EU AI Act + NIST AI RMF —
+  and GitHub Actions CI; multi-doc synthesis still open)
 
 ## Amendment — session 3 (2026-09-22): domain-agnostic template
 Charan's correction: the demo is AI governance for everything, not
@@ -104,3 +106,39 @@ product's boundary.
 - **Docs reframed:** README, MODEL_CARD, RISK_ASSESSMENT, LIMITATIONS now
   present a general AI-governance Q&A template ("bring your own policy
   corpus"); supply chain is one example domain.
+
+## Amendment — session 4 (2026-09-22): prompt-injection defenses, real-data corpus, red-team evals, CI
+
+- **Red-team defense stack** (`src/redteam.py` + `ingest.py` + `gate.py`):
+  query-time screening for direct injection / jailbreak / exfiltration
+  (refuse before the backend is ever invoked); ingest-time scanning that
+  excises injected-instruction lines and marks affected chunks
+  `trust="quarantined"`; a quarantined-source gate policy (quarantined
+  top-1 → refuse; quarantined lower in top-k → excluded from backend
+  context + escalate for human review); and an output check that converts
+  an answer containing an injected instruction into a refusal. All
+  decisions, including blocked attacks, are audit-logged.
+- **Real public-data domains** (labeled REAL in every file header):
+  `eu-ai-act` — Regulation (EU) 2024/1689 full text from EUR-Lex
+  (https://eur-lex.europa.eu/eli/reg/2024/1689/oj, retrieved 2026-09-22,
+  811 chunks); `nist-ai-rmf` — NIST AI RMF 1.0 from
+  https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf (retrieved
+  2026-09-22, 157 chunks). Corpus is now 23 docs / 997 chunks; the four
+  original domains remain synthetic and are labeled as such.
+- **Red-team corpus** (`evals/redteam_corpus/`, eval-only): 5 poisoned
+  documents (one per domain) with embedded prompt-injection payloads.
+  The eval harness folds them into each domain's index; the production
+  CLI never loads them.
+- **Real-model verification**: the 10 attack cases + 3 grounded controls
+  were run through the gate backed by `gpt-oss:20b` via Ollama Cloud
+  (`evals/ollama_redteam.py`). All 10 attacks refused with the model
+  invoked 0 times; all 3 controls answered grounded with citations;
+  audit logging verified (13/13 entries). Ablation with mitigations
+  disabled showed the model's own alignment as a second layer, not a
+  guarantee.
+- **Measured:** `unittest discover tests` 41/41; `src.eval` 37/37
+  (10/10 red-team attack cases refused); `--ab` TF-IDF 37/37 + dense
+  37/37, hit-rate@1 = 1.000 both.
+- **CI:** `.github/workflows/ci.yml` — unit tests + eval harness + A/B
+  eval on every push/PR to main.
+- **Full methodology and per-case results:** `docs/SESSION_4_REDTEAM.md`.

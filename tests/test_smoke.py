@@ -24,11 +24,12 @@ class SmokeTest(unittest.TestCase):
     def test_ingest_produces_chunks(self):
         self.assertGreaterEqual(len(self.chunks), 29)
         doc_ids = {c.doc_id for c in self.chunks}
-        self.assertEqual(len(doc_ids), 21)
+        # 21 synthetic docs + 2 real-data docs (EU AI Act, NIST AI RMF)
+        self.assertEqual(len(doc_ids), 23)
         domains = {c.domain for c in self.chunks}
         self.assertEqual(domains,
                          {"supply-chain", "hr-hiring", "data-privacy",
-                          "lending"})
+                          "lending", "eu-ai-act", "nist-ai-rmf"})
         # citations always name the domain
         for c in self.chunks:
             self.assertTrue(c.chunk_id.startswith(c.domain + "/"))
@@ -44,8 +45,8 @@ class SmokeTest(unittest.TestCase):
     def test_list_domains(self):
         from ingest import list_domains
         self.assertEqual(list_domains(ROOT / "corpus"),
-                         ["data-privacy", "hr-hiring", "lending",
-                          "supply-chain"])
+                         ["data-privacy", "eu-ai-act", "hr-hiring", "lending",
+                          "nist-ai-rmf", "supply-chain"])
 
     def test_retrieval_finds_hazmat(self):
         scored = self.retr.search(

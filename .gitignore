@@ -10,3 +10,4 @@ eval_audit_embed.jsonl
 review_queue.json
 review_queue.md
 review_decisions.jsonl
+eval_audit_ollama.jsonl

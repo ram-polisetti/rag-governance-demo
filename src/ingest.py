@@ -9,6 +9,8 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+from redteam import sanitize_chunk
+
 
 @dataclass
 class Chunk:
@@ -17,6 +19,7 @@ class Chunk:
     text: str
     section: str
     domain: str
+    trust: str = "trusted"  # "trusted" | "quarantined" (see src/redteam.py)
 
 
 def load_corpus(corpus_dir):
@@ -52,13 +55,21 @@ def chunk_text(text, max_chars=800):
 
 
 def ingest(corpus_dir, domain=None):
-    """Ingest the corpus; if domain is given, only that domain's documents."""
+    """Ingest the corpus; if domain is given, only that domain's documents.
+
+    Every chunk is scanned for embedded prompt-injection indicators
+    (src/redteam.py). Flagged chunks are sanitized (injected lines excised)
+    and marked trust="quarantined"; the gate refuses to answer from
+    quarantined evidence.
+    """
     docs = load_corpus(corpus_dir)
     chunks = []
     for doc_id, (ddomain, text) in docs.items():
         if domain is not None and ddomain != domain:
             continue
         for i, (ctext, section) in enumerate(chunk_text(text)):
-            chunks.append(Chunk(doc_id, f"{doc_id}#c{i}", ctext, section,
-                               ddomain))
+            cleaned, flags = sanitize_chunk(ctext)
+            trust = "quarantined" if flags else "trusted"
+            chunks.append(Chunk(doc_id, f"{doc_id}#c{i}", cleaned, section,
+                               ddomain, trust))
     return chunks
